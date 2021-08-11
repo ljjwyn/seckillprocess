@@ -10,6 +10,7 @@ public class CodeMsg {
     private String msg;
     //通用异常
     public static CodeMsg SUCCESS=new CodeMsg(200,"success");
+    public static CodeMsg SUCCESS_SECKILLING=new CodeMsg(200,"抢购中");
     public static CodeMsg SERVER_ERROR=new CodeMsg(500100,"服务端异常!");
     public static CodeMsg BIND_ERROR=new CodeMsg(500101,"参数校验异常:%s");
     public static CodeMsg REQUEST_ILLEAGAL=new CodeMsg(500102,"非法请求!");

@@ -3,6 +3,7 @@ package com.glodon.groupsix.seckillprocess;
 import com.glodon.groupsix.seckillprocess.service.SeckillService;
 import com.glodon.groupsix.seckillprocess.service.mq.SendMessage;
 import com.glodon.groupsix.seckillprocess.utils.JedisUtil;
+import com.glodon.groupsix.seckillprocess.utils.LettuceUtil;
 import com.glodon.groupsix.seckillprocess.utils.Simulation;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.junit.ContiPerfRule;
@@ -13,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 
 
 @RunWith(SpringRunner.class)
@@ -82,7 +86,15 @@ class SeckillprocessApplicationTests {
 
     @Test
     void mqTest(){
-        sendMessage.sendSeckillMessage();
+        sendMessage.sendSeckillMessage("test","15964969802");
+    }
+
+    @Autowired
+    LettuceUtil lettuceUtil;
+
+    @Test
+    void lettuceUtilTest(){
+        lettuceUtil.set("test","100");
     }
 
 
