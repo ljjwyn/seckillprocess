@@ -29,7 +29,8 @@ public class TSeckillRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public TSeckillRecord(String phone, String commodityId, String commodityName, String seckillPrice, Date seckillTime, String status) {
+    public TSeckillRecord(Integer id, String phone, String commodityId, String commodityName, String seckillPrice, Date seckillTime, String status) {
+        this.id = id;
         this.phone = phone;
         this.commodityId = commodityId;
         this.commodityName = commodityName;
@@ -51,12 +52,12 @@ public class TSeckillRecord implements Serializable {
         }
         TSeckillRecord other = (TSeckillRecord) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
-            && (this.getCommodityId() == null ? other.getCommodityId() == null : this.getCommodityId().equals(other.getCommodityId()))
-            && (this.getCommodityName() == null ? other.getCommodityName() == null : this.getCommodityName().equals(other.getCommodityName()))
-            && (this.getSeckillPrice() == null ? other.getSeckillPrice() == null : this.getSeckillPrice().equals(other.getSeckillPrice()))
-            && (this.getSeckillTime() == null ? other.getSeckillTime() == null : this.getSeckillTime().equals(other.getSeckillTime()))
-            && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()));
+                && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
+                && (this.getCommodityId() == null ? other.getCommodityId() == null : this.getCommodityId().equals(other.getCommodityId()))
+                && (this.getCommodityName() == null ? other.getCommodityName() == null : this.getCommodityName().equals(other.getCommodityName()))
+                && (this.getSeckillPrice() == null ? other.getSeckillPrice() == null : this.getSeckillPrice().equals(other.getSeckillPrice()))
+                && (this.getSeckillTime() == null ? other.getSeckillTime() == null : this.getSeckillTime().equals(other.getSeckillTime()))
+                && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()));
     }
 
     @Override

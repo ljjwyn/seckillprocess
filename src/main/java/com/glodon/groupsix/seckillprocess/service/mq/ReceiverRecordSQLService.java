@@ -19,5 +19,6 @@ public class ReceiverRecordSQLService {
     public void process(TSeckillRecord tSeckillRecord) {
         // 高并发测试记得注释掉这些日志
         log.info("2、收到抢购记录消息  :{} ", tSeckillRecord.toString());
+        tSeckillRecordDao.insertSelective(tSeckillRecord);
     }
 }

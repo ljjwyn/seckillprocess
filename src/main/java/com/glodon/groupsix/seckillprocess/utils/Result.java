@@ -18,7 +18,7 @@ public class Result<T> {
         this.data=data;
     }
     //error
-    private Result(CodeMsg cm) {
+    public Result(CodeMsg cm) {
         if(cm==null) {
             return;
         }

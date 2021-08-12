@@ -36,14 +36,14 @@ public class ReceiverSeckillService {
         String value = tSeckillRecord.getPhone();
         //TODO 这里写个持久化日志。
         if (lettuceUtil.contains(phoneKey, value)){
-            log.info("失败！重复抢购");
+            log.info("v4.0==失败！重复抢购");
             tSeckillRecord.setStatus("失败");
             sendMessage.sendRecordSQLMessage(tSeckillRecord);
             return ;
         }
         int surplusStock = Integer.parseInt(lettuceUtil.get(key));
         if (surplusStock == 0){
-            log.info("失败！抢完了，库存为0");
+            log.info("v4.0==失败！抢完了，库存为0");
             tSeckillRecord.setStatus("失败");
             sendMessage.sendRecordSQLMessage(tSeckillRecord);
             return ;
@@ -51,8 +51,8 @@ public class ReceiverSeckillService {
         // TODO 还是上锁，想想解决方案。
         lock.lock();
         try {
-            log.info("获得抢购机会");
             surplusStock-=1;
+            log.info("v4.0======获得抢购机会:库存剩余：{}", surplusStock);
             lettuceUtil.sadd(phoneKey, value);
             lettuceUtil.set(key, String.valueOf(surplusStock));
             // TODO 由于是异步操作需要对秒杀中状态更新，之后需要写一个接口。
