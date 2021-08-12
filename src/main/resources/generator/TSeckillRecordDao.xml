@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glodon.groupsix.seckillprocess.mapper.TSeckillRecordDao">
+  <resultMap id="BaseResultMap" type="com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="commodity_id" jdbcType="VARCHAR" property="commodityId" />
+    <result column="commodity_name" jdbcType="VARCHAR" property="commodityName" />
+    <result column="seckill_price" jdbcType="VARCHAR" property="seckillPrice" />
+    <result column="seckill_time" jdbcType="TIMESTAMP" property="seckillTime" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, phone, commodity_id, commodity_name, seckill_price, seckill_time, `status`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_seckill_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_seckill_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord" useGeneratedKeys="true">
+    insert into t_seckill_record (phone, commodity_id, commodity_name, 
+      seckill_price, seckill_time, `status`
+      )
+    values (#{phone,jdbcType=VARCHAR}, #{commodityId,jdbcType=VARCHAR}, #{commodityName,jdbcType=VARCHAR}, 
+      #{seckillPrice,jdbcType=VARCHAR}, #{seckillTime,jdbcType=TIMESTAMP}, #{status,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord" useGeneratedKeys="true">
+    insert into t_seckill_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="commodityId != null">
+        commodity_id,
+      </if>
+      <if test="commodityName != null">
+        commodity_name,
+      </if>
+      <if test="seckillPrice != null">
+        seckill_price,
+      </if>
+      <if test="seckillTime != null">
+        seckill_time,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="commodityId != null">
+        #{commodityId,jdbcType=VARCHAR},
+      </if>
+      <if test="commodityName != null">
+        #{commodityName,jdbcType=VARCHAR},
+      </if>
+      <if test="seckillPrice != null">
+        #{seckillPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="seckillTime != null">
+        #{seckillTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord">
+    update t_seckill_record
+    <set>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="commodityId != null">
+        commodity_id = #{commodityId,jdbcType=VARCHAR},
+      </if>
+      <if test="commodityName != null">
+        commodity_name = #{commodityName,jdbcType=VARCHAR},
+      </if>
+      <if test="seckillPrice != null">
+        seckill_price = #{seckillPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="seckillTime != null">
+        seckill_time = #{seckillTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord">
+    update t_seckill_record
+    set phone = #{phone,jdbcType=VARCHAR},
+      commodity_id = #{commodityId,jdbcType=VARCHAR},
+      commodity_name = #{commodityName,jdbcType=VARCHAR},
+      seckill_price = #{seckillPrice,jdbcType=VARCHAR},
+      seckill_time = #{seckillTime,jdbcType=TIMESTAMP},
+      `status` = #{status,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
