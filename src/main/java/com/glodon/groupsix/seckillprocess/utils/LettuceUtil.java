@@ -31,7 +31,11 @@ public class LettuceUtil {
      * @return
      */
     public String get(String key){
-        return redisTemplate.opsForValue().get(key);
+        String value = redisTemplate.opsForValue().get(key);
+        if (value == null){
+            return "0";
+        }
+        return value;
     }
 
 

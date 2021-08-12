@@ -6,4 +6,6 @@ import lombok.Data;
 public class SeckillInput {
     private String commodityCode;
     private String phone;
+    private String commodityName;
+    private String SeckillPrice;
 }

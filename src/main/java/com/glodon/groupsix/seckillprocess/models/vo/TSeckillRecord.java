@@ -29,6 +29,15 @@ public class TSeckillRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public TSeckillRecord(String phone, String commodityId, String commodityName, String seckillPrice, Date seckillTime, String status) {
+        this.phone = phone;
+        this.commodityId = commodityId;
+        this.commodityName = commodityName;
+        this.seckillPrice = seckillPrice;
+        this.seckillTime = seckillTime;
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {

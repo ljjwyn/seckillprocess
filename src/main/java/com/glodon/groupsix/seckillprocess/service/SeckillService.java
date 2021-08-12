@@ -1,5 +1,6 @@
 package com.glodon.groupsix.seckillprocess.service;
 
+import com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord;
 import com.glodon.groupsix.seckillprocess.service.mq.SendMessage;
 import com.glodon.groupsix.seckillprocess.utils.CodeMsg;
 import com.glodon.groupsix.seckillprocess.utils.JedisUtil;
@@ -8,6 +9,7 @@ import com.glodon.groupsix.seckillprocess.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,6 +26,9 @@ public class SeckillService {
     @Autowired
     LettuceUtil lettuceUtil;
 
+    @Autowired
+    TSeckillRecordService tSeckillRecordService;
+
     private static ReentrantLock lock = new ReentrantLock();
 
     private ConcurrentHashMap<String, BlockingQueue<String>> seckillQueue = new ConcurrentHashMap<>();
@@ -35,11 +40,12 @@ public class SeckillService {
 
     /**
      * v1.0版本
-     * 依靠可重入锁，多次校验与写入基于redis
+     * 依靠可重入锁，多次校验与写入基于redis,停止维护
      * @param commodityCode
      * @param phone
      * @return Result
      */
+    @Deprecated
     public Result seckill(String commodityCode, String phone){
         String phoneKey = commodityCode+"_phone";
         lock.lock();
@@ -66,15 +72,23 @@ public class SeckillService {
      * lettuce天生线程安全锁的粒度可以适度降低
      * @param commodityCode
      * @param phone
+     * @param commodityName
+     * @param commodityCode
      * @return Result
      */
-    public Result seckillV2(String commodityCode, String phone){
+    public Result seckillV2(String commodityCode, String phone, String commodityName, String seckillPrice){
         String phoneKey = commodityCode+"_phone";
         if (lettuceUtil.contains(phoneKey, phone)){
+            // 数据库插入
+            tSeckillRecordService.insertSelective(new TSeckillRecord(phone, commodityCode
+                    , commodityName, seckillPrice, new Date(), "失败"));
             return new Result(CodeMsg.REPEATE_MIAOSHA);
         }
         int surplusStock = Integer.parseInt(lettuceUtil.get(commodityCode));
         if (surplusStock == 0){
+            // 数据库插入
+            tSeckillRecordService.insertSelective(new TSeckillRecord(phone, commodityCode
+                    , commodityName, seckillPrice, new Date(), "失败"));
             return new Result(CodeMsg.MIAOSHA_OVER_ERROR);
         }
         lock.lock();
@@ -82,18 +96,26 @@ public class SeckillService {
             surplusStock-=1;
             lettuceUtil.sadd(phoneKey, phone);
             lettuceUtil.set(commodityCode, String.valueOf(surplusStock));
+            // 数据库插入
+            tSeckillRecordService.insertSelective(new TSeckillRecord(phone, commodityCode
+                    , commodityName, seckillPrice, new Date(), "成功"));
         }finally {
             lock.unlock();
         }
         return new Result(CodeMsg.SUCCESS);
     }
 
-    public Result seckillV3(String commodityCode, String phone){
+    public Result seckillV3(String commodityCode, String phone, String commodityName, String seckillPrice){
         int surplusStock = Integer.parseInt(lettuceUtil.get(commodityCode));
         if (surplusStock == 0){
+            sendMessage.sendRecordSQLMessage(new TSeckillRecord(phone, commodityCode
+                    , commodityName, seckillPrice, new Date(), "失败"));
             return new Result(CodeMsg.MIAOSHA_OVER_ERROR);
         }
-        sendMessage.sendSeckillMessage(commodityCode, phone);
+        TSeckillRecord tSeckillRecord = new TSeckillRecord(phone, commodityCode
+                , commodityName, seckillPrice, new Date(), "秒杀中");
+        // sendMessage.sendRecordSQLMessage(tSeckillRecord);
+        sendMessage.sendSeckillMessage(tSeckillRecord);
         return new Result(CodeMsg.SUCCESS_SECKILLING);
     }
 }

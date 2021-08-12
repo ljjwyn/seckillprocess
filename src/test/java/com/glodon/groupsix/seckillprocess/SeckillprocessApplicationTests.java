@@ -86,7 +86,7 @@ class SeckillprocessApplicationTests {
 
     @Test
     void mqTest(){
-        sendMessage.sendSeckillMessage("test","15964969802");
+        //sendMessage.sendSeckillMessage("test","15964969802");
     }
 
     @Autowired
