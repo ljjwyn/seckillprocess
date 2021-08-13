@@ -3,10 +3,12 @@ package com.glodon.groupsix.seckillprocess;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 @SpringBootApplication
+@EnableAsync
 public class SeckillprocessApplication {
 
     public static void main(String[] args) {

@@ -1,10 +1,5 @@
 package com.glodon.groupsix.seckillprocess.utils;
 
-/**
- * @author:zhuym
- * @date: 2019/8/12
- * @time: 14:05
- */
 public class CodeMsg {
     private int code;
     private String msg;
@@ -31,6 +26,7 @@ public class CodeMsg {
     public static CodeMsg STOCK_IS_NULL=new CodeMsg(515,"库存为0！");
     public static CodeMsg IS_NOT_INEFFECTIVE=new CodeMsg(516,"活动未生效！");
     public static CodeMsg IS_EXPIRED=new CodeMsg(517,"活动已过期！");
+    public static CodeMsg INFORMATION_NOT_SYNC=new CodeMsg(518,"上架信息未同步！");
 
     public CodeMsg(int code,String msg) {
         this.code=code;

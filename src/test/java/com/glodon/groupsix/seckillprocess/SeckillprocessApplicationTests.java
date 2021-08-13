@@ -1,6 +1,7 @@
 package com.glodon.groupsix.seckillprocess;
 
 import com.glodon.groupsix.seckillprocess.mapper.TSeckillRecordDao;
+import com.glodon.groupsix.seckillprocess.service.CommoditySyncService;
 import com.glodon.groupsix.seckillprocess.service.SeckillService;
 import com.glodon.groupsix.seckillprocess.service.mq.SendMessage;
 import com.glodon.groupsix.seckillprocess.utils.JedisUtil;
@@ -71,6 +72,13 @@ class SeckillprocessApplicationTests {
     @Test
     void lettuceUtilTest(){
         lettuceUtil.set("test","100");
+    }
+
+    @Autowired
+    CommoditySyncService commoditySyncService;
+    @Test
+    void lettuceUtilTest2(){
+        commoditySyncService.letCommodityPutaway("test", "50", 1000L);
     }
 
 

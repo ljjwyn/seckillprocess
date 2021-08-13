@@ -70,19 +70,19 @@ public class SeckillController {
                 seckillInput.getCommodityName(), seckillInput.getSeckillPrice());
     }
 
-    @PostMapping(value = "/getCountAndUser")
+    @GetMapping(value = "/getCountAndUser")
     public Result GetCountAndUser(@ApiParam(name="commodityCode",
             value="商品编号",required=true) @RequestParam("commodityCode") String commodityCode){
         return seckillService.getCountAndUser(commodityCode);
     }
 
-    @PostMapping("/recordByPhone")
+    @GetMapping("/recordByPhone")
     public Result recordByPhone(@ApiParam(name="phone", value="手机号", required=true)
                                                           @RequestParam("phone") String phone) {
         return seckillService.getRecordByPhone(phone);
     }
 
-    @PostMapping("/recordByCommodityId")
+    @GetMapping("/recordByCommodityId")
     public Result recordByCommodityCode(@ApiParam(name="commodityCode",
             value="商品编号",required=true) @RequestParam("commodityCode") String commodityCode) {
         return seckillService.getRecordByCommodityId(commodityCode);

@@ -1,8 +1,8 @@
 package com.glodon.groupsix.seckillprocess.utils;
 
 /**
- * @author:zhuym
- * @date: 2019/8/12
+ * @author:lijjwyn
+ * @date: 2021/08/11
  * @time: 14:02
  */
 

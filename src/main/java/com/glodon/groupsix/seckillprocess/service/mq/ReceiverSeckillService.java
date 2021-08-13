@@ -1,6 +1,7 @@
 package com.glodon.groupsix.seckillprocess.service.mq;
 
 import com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord;
+import com.glodon.groupsix.seckillprocess.rest.RestCommodityService;
 import com.glodon.groupsix.seckillprocess.utils.LettuceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -19,6 +20,9 @@ public class ReceiverSeckillService {
 
     @Autowired
     SendMessage sendMessage;
+
+    @Autowired
+    RestCommodityService restCommodityService;
 
     private static ReentrantLock lock = new ReentrantLock();
 
@@ -57,6 +61,8 @@ public class ReceiverSeckillService {
             lettuceUtil.set(key, String.valueOf(surplusStock));
             // TODO 由于是异步操作需要对秒杀中状态更新，之后需要写一个接口。
             tSeckillRecord.setStatus("成功");
+            // 调商品管理系统接口，同步减库存
+            restCommodityService.sendCommodityStockCount(key, surplusStock);
             sendMessage.sendRecordSQLMessage(tSeckillRecord);
         }finally {
             lock.unlock();

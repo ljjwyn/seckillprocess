@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ljjwyn
@@ -31,6 +32,16 @@ public class LettuceUtil {
      */
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
+    }
+
+    /**
+     * 新增一个  add 并设置过期时间
+     *
+     * @param key
+     * @param value
+     */
+    public void setValueAndExpire(String key, String value, Long expireTime) {
+        redisTemplate.opsForValue().set(key, value , expireTime, TimeUnit.MILLISECONDS);
     }
 
     /**

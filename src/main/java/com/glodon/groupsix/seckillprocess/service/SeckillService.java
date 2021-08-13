@@ -99,8 +99,12 @@ public class SeckillService {
      */
     public Result<CodeMsg> seckillV2(String commodityCode, String phone, String commodityName, String seckillPrice){
         if (!lettuceUtil.hasKey(commodityCode)){
-            log.info("v4.0==失败！商品未上架或已下架");
-            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
+            log.info("v4.0==失败！上架信息未同步");
+            return new Result<>(CodeMsg.INFORMATION_NOT_SYNC);
+        }
+        if (lettuceUtil.hasKey(commodityCode+"_startTime")){
+            log.info("v4.0==失败！活动未开始");
+            return new Result<>(CodeMsg.IS_NOT_INEFFECTIVE);
         }
         String phoneKey = commodityCode+"_phone";
         lock.lock();
@@ -147,8 +151,12 @@ public class SeckillService {
      */
     public Result<CodeMsg> seckillV3(String commodityCode, String phone, String commodityName, String seckillPrice){
         if (!lettuceUtil.hasKey(commodityCode)){
-            log.info("v4.0==失败！商品未上架或已下架");
-            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
+            log.info("v4.0==失败！上架信息未同步");
+            return new Result<>(CodeMsg.INFORMATION_NOT_SYNC);
+        }
+        if (lettuceUtil.hasKey(commodityCode+"_startTime")){
+            log.info("v4.0==失败！活动未开始");
+            return new Result<>(CodeMsg.IS_NOT_INEFFECTIVE);
         }
         String phoneKey = commodityCode+"_phone";
         lock.lock();
@@ -159,7 +167,7 @@ public class SeckillService {
             log.info("v3.0==失败！重复抢购");
             tSeckillRecord.setStatus("失败");
             sendMessage.sendRecordSQLMessage(tSeckillRecord);
-            return new Result(CodeMsg.REPEATE_MIAOSHA);
+            return new Result<>(CodeMsg.REPEATE_MIAOSHA);
         }
         int surplusStock = Integer.parseInt(lettuceUtil.get(commodityCode));
         if (surplusStock == 0){
@@ -167,7 +175,7 @@ public class SeckillService {
             log.info("v3.0==失败！抢完了，库存为0");
             tSeckillRecord.setStatus("失败");
             sendMessage.sendRecordSQLMessage(tSeckillRecord);
-            return new Result(CodeMsg.MIAOSHA_OVER_ERROR);
+            return new Result<>(CodeMsg.MIAOSHA_OVER_ERROR);
         }
         try {
             surplusStock-=1;
@@ -180,7 +188,7 @@ public class SeckillService {
         }finally {
             lock.unlock();
         }
-        return new Result(CodeMsg.SUCCESS);
+        return new Result<>(CodeMsg.SUCCESS);
     }
 
     /**
@@ -194,29 +202,33 @@ public class SeckillService {
      * @return Result
      */
     public Result<CodeMsg> seckillV4(String commodityCode, String phone, String commodityName, String seckillPrice){
-        if (!lettuceUtil.hasKey(commodityCode)){
-            log.info("v4.0==失败！商品未上架或已下架");
-            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
+        if (Boolean.FALSE.equals(lettuceUtil.hasKey(commodityCode))){
+            log.info("v4.0==失败！上架信息未同步");
+            return new Result<>(CodeMsg.INFORMATION_NOT_SYNC);
+        }
+        if (Boolean.TRUE.equals(lettuceUtil.hasKey(commodityCode+"_startTime"))){
+            log.info("v4.0==失败！活动未开始");
+            return new Result<>(CodeMsg.IS_NOT_INEFFECTIVE);
         }
         String phoneKey = commodityCode+"_phone";
-        if (lettuceUtil.contains(phoneKey, phone)){
+        TSeckillRecord tSeckillRecord = new TSeckillRecord(null, phone, commodityCode
+                , commodityName, seckillPrice, new Date(), "秒杀中");
+        if (Boolean.TRUE.equals(lettuceUtil.contains(phoneKey, phone))){
             log.info("v4.0==失败！重复抢购");
-            sendMessage.sendRecordSQLMessage(new TSeckillRecord(null, phone, commodityCode
-                    , commodityName, seckillPrice, new Date(), "失败"));
-            return new Result(CodeMsg.REPEATE_MIAOSHA);
+            tSeckillRecord.setStatus("失败");
+            sendMessage.sendRecordSQLMessage(tSeckillRecord);
+            return new Result<>(CodeMsg.REPEATE_MIAOSHA);
         }
         int surplusStock = Integer.parseInt(lettuceUtil.get(commodityCode));
         if (surplusStock == 0){
-            sendMessage.sendRecordSQLMessage(new TSeckillRecord(null, phone, commodityCode
-                    , commodityName, seckillPrice, new Date(), "失败"));
-            restCommodityService.sendCommoditySoldOutInfo(commodityCode);
-            return new Result(CodeMsg.MIAOSHA_OVER_ERROR);
+            log.info("v4.0==失败！抢完了，库存为0");
+            tSeckillRecord.setStatus("失败");
+            sendMessage.sendRecordSQLMessage(tSeckillRecord);
+            return new Result<>(CodeMsg.MIAOSHA_OVER_ERROR);
         }
-        TSeckillRecord tSeckillRecord = new TSeckillRecord(null, phone, commodityCode
-                , commodityName, seckillPrice, new Date(), "秒杀中");
         // sendMessage.sendRecordSQLMessage(tSeckillRecord);
         sendMessage.sendSeckillMessage(tSeckillRecord);
-        return new Result(CodeMsg.SUCCESS_SECKILLING);
+        return new Result<>(CodeMsg.SUCCESS_SECKILLING);
     }
 
     /**
@@ -232,7 +244,7 @@ public class SeckillService {
         Set<String> userNumber = lettuceUtil.values(phoneKey);
         countAndUser.setCount(count);
         countAndUser.setUserNumber(userNumber);
-        return new Result(countAndUser);
+        return new Result<>(countAndUser);
     }
 
     /**
@@ -242,7 +254,7 @@ public class SeckillService {
      * @return Result
      */
     public Result<List<TSeckillRecord>> getRecordByPhone(String phone) {
-        return new Result(tSeckillRecordDao.getRecordByPhone(phone));
+        return new Result<>(tSeckillRecordDao.getRecordByPhone(phone));
     }
 
     /**
