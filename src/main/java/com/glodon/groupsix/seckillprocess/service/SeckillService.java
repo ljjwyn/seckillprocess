@@ -4,6 +4,7 @@ import com.glodon.groupsix.seckillprocess.mapper.TSeckillRecordDao;
 import com.glodon.groupsix.seckillprocess.models.vo.GetCountAndUser;
 import com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecord;
 import com.glodon.groupsix.seckillprocess.models.vo.TSeckillRecordInfo;
+import com.glodon.groupsix.seckillprocess.rest.RestCommodityService;
 import com.glodon.groupsix.seckillprocess.service.mq.SendMessage;
 import com.glodon.groupsix.seckillprocess.utils.CodeMsg;
 import com.glodon.groupsix.seckillprocess.utils.JedisUtil;
@@ -37,6 +38,9 @@ public class SeckillService {
     @Autowired
     TSeckillRecordDao tSeckillRecordDao;
 
+    @Autowired
+    RestCommodityService restCommodityService;
+
     private static final ReentrantLock lock = new ReentrantLock();
 
     /**
@@ -50,6 +54,10 @@ public class SeckillService {
      */
     @Deprecated
     public Result<CodeMsg> seckill(String commodityCode, String phone, String commodityName, String seckillPrice){
+        if (!lettuceUtil.hasKey(commodityCode)){
+            log.info("v4.0==失败！商品未上架或已下架");
+            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
+        }
         String phoneKey = commodityCode+"_phone";
         lock.lock();
         try {
@@ -90,6 +98,10 @@ public class SeckillService {
      * @return Result
      */
     public Result<CodeMsg> seckillV2(String commodityCode, String phone, String commodityName, String seckillPrice){
+        if (!lettuceUtil.hasKey(commodityCode)){
+            log.info("v4.0==失败！商品未上架或已下架");
+            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
+        }
         String phoneKey = commodityCode+"_phone";
         lock.lock();
         try {
@@ -134,6 +146,10 @@ public class SeckillService {
      * @return Result
      */
     public Result<CodeMsg> seckillV3(String commodityCode, String phone, String commodityName, String seckillPrice){
+        if (!lettuceUtil.hasKey(commodityCode)){
+            log.info("v4.0==失败！商品未上架或已下架");
+            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
+        }
         String phoneKey = commodityCode+"_phone";
         lock.lock();
         TSeckillRecord tSeckillRecord = new TSeckillRecord(null, phone, commodityCode
@@ -178,11 +194,9 @@ public class SeckillService {
      * @return Result
      */
     public Result<CodeMsg> seckillV4(String commodityCode, String phone, String commodityName, String seckillPrice){
-        int surplusStock = Integer.parseInt(lettuceUtil.get(commodityCode));
-        if (surplusStock == 0){
-            sendMessage.sendRecordSQLMessage(new TSeckillRecord(null, phone, commodityCode
-                    , commodityName, seckillPrice, new Date(), "失败"));
-            return new Result(CodeMsg.MIAOSHA_OVER_ERROR);
+        if (!lettuceUtil.hasKey(commodityCode)){
+            log.info("v4.0==失败！商品未上架或已下架");
+            return new Result(CodeMsg.IS_NOT_INEFFECTIVE);
         }
         String phoneKey = commodityCode+"_phone";
         if (lettuceUtil.contains(phoneKey, phone)){
@@ -190,6 +204,13 @@ public class SeckillService {
             sendMessage.sendRecordSQLMessage(new TSeckillRecord(null, phone, commodityCode
                     , commodityName, seckillPrice, new Date(), "失败"));
             return new Result(CodeMsg.REPEATE_MIAOSHA);
+        }
+        int surplusStock = Integer.parseInt(lettuceUtil.get(commodityCode));
+        if (surplusStock == 0){
+            sendMessage.sendRecordSQLMessage(new TSeckillRecord(null, phone, commodityCode
+                    , commodityName, seckillPrice, new Date(), "失败"));
+            restCommodityService.sendCommoditySoldOutInfo(commodityCode);
+            return new Result(CodeMsg.MIAOSHA_OVER_ERROR);
         }
         TSeckillRecord tSeckillRecord = new TSeckillRecord(null, phone, commodityCode
                 , commodityName, seckillPrice, new Date(), "秒杀中");

@@ -15,6 +15,15 @@ public class LettuceUtil {
     private RedisTemplate<String,String> redisTemplate;
 
     /**
+     * 判断有没有key
+     *
+     * @param key key
+     */
+    public Boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
+    }
+
+    /**
      * 新增一个  add
      *
      * @param key
@@ -36,6 +45,17 @@ public class LettuceUtil {
             return "0";
         }
         return value;
+    }
+
+    /**
+     * 根据key删除对应记录
+     *
+     * @param key
+     * @return
+     */
+    public Boolean del(String key){
+        Boolean flag = redisTemplate.delete(key);
+        return flag;
     }
 
 
